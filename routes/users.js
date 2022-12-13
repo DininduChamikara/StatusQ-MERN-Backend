@@ -3,10 +3,10 @@ const router = express.Router();
 const User = require("../models/user");
 
 const bcrypt = require("bcrypt");
-const cookieParser = require('cookie-parser');
-const {createTokens, validateToken} = require('../JWT')
+const cookieParser = require("cookie-parser");
+const { createTokens, validateToken } = require("../JWT");
 
-router.get("/", validateToken ,async (req, res) => {
+router.get("/", validateToken, async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
@@ -25,48 +25,80 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  bcrypt.hash(req.body.password, 10).then((hash) => {
-    User.create({
-      firstname: req.body.firstname,
-      lastname: req.body.lastname,
-      email: req.body.email,
-      password: hash,
-      userType: req.body.userType,
-      state: req.body.state,
-    })
-      .then(() => {
-        res.json("USER REGISTERED");
+  const { email } = req.body;
+  const user = await User.findOne({ email: email });
+
+  if (user) {
+    res.json({
+      responseCode: "1000",
+      status: "error",
+      message: "Already you have an account",
+    });
+  } else {
+    bcrypt.hash(req.body.password, 10).then((hash) => {
+      User.create({
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        email: req.body.email,
+        password: hash,
+        userType: req.body.userType,
+        state: req.body.state,
       })
-      .catch((err) => {
-        if (err) {
-          res.status(400).json({ error: err });
-        }
-      });
-  });
+        .then(() => {
+          // res.json("USER REGISTERED");
+          res.json({
+            responseCode: "00",
+            status: "success",
+            message: "You are registered successfully",
+          });
+        })
+        .catch((err) => {
+          if (err) {
+            res.status(400).json({ error: err });
+          }
+        });
+    });
+  }
 });
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email: email });
 
-  if (!user) res.status(400).json({ error: "User Doesn't Exist" });
-
-  const dbPassword = user.password;
-  bcrypt.compare(password, dbPassword).then((match) => {
-    if (!match) {
-      res.status(400).json({ error: "Wrong Username or Password" });
-    } else {
-
-        const accessToken = createTokens(user)
+  if (!user) {
+    res.status(400).json({
+      // error: "User Doesn't Exist"
+      responseCode: "1000",
+      status: "failure",
+      message: "Invalid Username or Password",
+    });
+  } else {
+    const dbPassword = user.password;
+    bcrypt.compare(password, dbPassword).then((match) => {
+      if (!match) {
+        res.status(400).json({
+          // error: "Wrong Username or Password"
+          responseCode: "1000",
+          status: "failure",
+          message: "Invalid Username or Password",
+        });
+      } else {
+        const accessToken = createTokens(user);
         res.cookie("access-token", accessToken, {
-            maxAge: 60*60*24,
-            // for more safty
-            httpOnly: true,
-        })
+          maxAge: 60 * 60 * 24,
+          // for more safty
+          httpOnly: true,
+        });
 
-      res.json("LOGGED IN");
-    }
-  });
+        res.json({
+          responseCode: "00",
+          status: "success",
+          message: "You are logged successfully",
+          user: user,
+        });
+      }
+    });
+  }
 });
 
 // router.patch('/:id', async(req, res) => {
