@@ -1,5 +1,6 @@
 const cookieParser = require('cookie-parser')
 const express = require('express')
+const cors = require('cors');
 const mongoose = require('mongoose')
 const url = 'mongodb://localhost/StatusQ_DB_New'
 
@@ -13,6 +14,7 @@ con.on('open', () => {
 })
 
 app.use(express.json())
+app.use(cors())
 app.use(cookieParser())
 
 const alienRouter = require('./routes/aliens')
