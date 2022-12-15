@@ -28,6 +28,35 @@ router.get("/", async (req, res) => {
 //   }
 // });
 
+router.post("/getPromotersList", async (req, res) => {
+  const {
+    platform,
+    minAccessibleViews,
+    educationAudience,
+    ageAudience,
+    regionalAudience,
+    languageAudience,
+    genderAudience,
+    responseCount,
+    state,
+  } = req.body;
+
+  const promoters = await Promoter.find();
+  const qualifiedPromoters = promoters.filter(
+    (p) =>
+      (p.socialMediaList[0].platform === platform &&
+        p.socialMediaList[0].accessibleViewsCount >= minAccessibleViews) ||
+      (p.socialMediaList[1].platform === platform &&
+        p.socialMediaList[1].accessibleViewsCount >= minAccessibleViews) ||
+      (p.socialMediaList[2].platform === platform &&
+        p.socialMediaList[2].accessibleViewsCount >= minAccessibleViews)
+  );
+
+  res.json({
+    promoters: qualifiedPromoters,
+  });
+});
+
 router.post("/", async (req, res) => {
   const {
     userId,
