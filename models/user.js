@@ -26,8 +26,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         default:"ACTIVE"
-    }
-
+    },
 })
 
 module.exports = mongoose.model('User', userSchema)

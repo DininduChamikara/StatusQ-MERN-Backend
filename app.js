@@ -23,6 +23,12 @@ app.use('/aliens', alienRouter)
 const userRouter = require('./routes/users')
 app.use('/users', userRouter)
 
+const reviewRouter = require('./routes/reviews')
+app.use('/reviews', reviewRouter)
+
+const promoterRouter = require('./routes/promoters')
+app.use('/promoters', promoterRouter)
+
 app.listen(9000, () => {
     console.log('Server started')
 })
