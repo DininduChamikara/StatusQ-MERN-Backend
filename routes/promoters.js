@@ -28,6 +28,91 @@ router.get("/", async (req, res) => {
 //   }
 // });
 
+router.post("/getPromotersList", async (req, res) => {
+  const {
+    platform,
+    minAccessibleViews,
+    educationAudience,
+    ageAudience,
+    regionalAudience,
+    languageAudience,
+    genderAudience,
+    responseCount,
+    state,
+  } = req.body;
+
+  // these 2 arrays should pararal
+  const campaignAudienceArr = [educationAudience, ageAudience, regionalAudience, languageAudience];
+  const promoterAudienceCatTypeArr = ["education", "age", "region", "language"];
+ 
+  const promoters = await Promoter.find();
+  const qualifiedPromoters = promoters.filter(
+    (p) =>
+      (p.socialMediaList[0].platform === platform &&
+        p.socialMediaList[0].accessibleViewsCount >= minAccessibleViews) ||
+      (p.socialMediaList[1].platform === platform &&
+        p.socialMediaList[1].accessibleViewsCount >= minAccessibleViews) ||
+      (p.socialMediaList[2].platform === platform &&
+        p.socialMediaList[2].accessibleViewsCount >= minAccessibleViews)
+  );
+
+  let matchIndexEach = 0;
+
+  const matchedPromotersList = []; 
+
+  qualifiedPromoters.map((promoter) => {
+    promoter.promoterAudienceCategoryList.map((audCat) => {
+      if(audCat.platform === platform){
+        promoterAudienceCatTypeArr.map((cat) => {
+          if(audCat.categoryType === cat){
+            campaignAudienceArr.map((camAudCat) => {
+              camAudCat.map((category) => {
+                if(category === audCat.category){
+                  let minAccessViews = 0; 
+                  promoter.socialMediaList.map((platformX) => {
+                    if(platformX.platform === platform){
+                      minAccessViews = platformX.accessibleViewsCount;
+                      matchIndexEach = matchIndexEach + (audCat.count)/(minAccessViews);
+                    }
+                  })
+                  
+                }
+              })
+            })
+          }
+        })
+      }
+    })
+    promoter.promoterGenderAudienceList.map((genAudCat) => {
+      if(genAudCat.platform === platform){
+        genderAudience.map((genCat) => {
+          if(genCat === "male"){
+            matchIndexEach = matchIndexEach + ((genAudCat.malePercentage)/100)
+          }else if(genCat === "female"){
+            matchIndexEach = matchIndexEach + ((genAudCat.femalePercentage)/100)
+          }
+        })
+      }
+    })
+    const matchedPromoterObj = {
+      promoter: promoter,
+      matchIndex: matchIndexEach,
+    }
+    // console.log("matchIndexForEach is promoter", matchIndexEach)
+    matchedPromotersList.push(matchedPromoterObj);
+  })
+
+  const sortedList = matchedPromotersList.sort((a, b) => b.matchIndex - a.matchIndex);
+  const filteredList = sortedList.slice(0, responseCount);
+
+  res.json({
+    responseCode: "00",
+    status: "success",
+    message: "The most suitable promoters list is generated",
+    promoterListFinalResponseItemDTO: filteredList,
+  });
+});
+
 router.post("/", async (req, res) => {
   const {
     userId,
