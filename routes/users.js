@@ -101,6 +101,52 @@ router.post("/login", async (req, res) => {
   }
 });
 
+router.post("/saveSettings", async (req, res) => {
+  const {
+    userId,
+    imgUrl,
+    contactName,
+    contactEmail,
+    contactPhone,
+    accountStatus,
+    bankName,
+    branchName,
+    branchCode,
+    accountNumber,
+    accountHolderName,
+  } = req.body;
+
+  let user;
+
+  try {
+    user = await User.findOne({ _id: userId });
+    if (user) {
+      user.imgUrl = imgUrl;
+      user.contactName = contactName;
+      user.contactEmail = contactEmail;
+      user.contactPhone = contactPhone;
+      user.accountStatus = accountStatus;
+      user.bankName = bankName;
+      user.branchName = branchName;
+      user.branchCode = branchCode;
+      user.accountNumber = accountNumber;
+      user.accountHolderName = accountHolderName;
+    }
+  } catch (err) {
+    res.json(err);
+  } finally {
+    const u = await user.save();
+    res.json({
+      responseCode: "00",
+      status: "success",
+      message: "You are successfully update the changes",
+      user: u,
+    });
+  }
+
+  // let user = await User.findById({userId})
+});
+
 // router.patch('/:id', async(req, res) => {
 //     try{
 //         const user = await User.findById(req.params.id)
