@@ -7,7 +7,6 @@ const { createTokens, validateToken } = require("../JWT");
 router.get("/", async (req, res) => {
   try {
     const reviews = await Review.find();
-    console.log(reviews)
     res.json({
       responseCode: "00",
       status: "success",

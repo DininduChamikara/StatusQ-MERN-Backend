@@ -18,6 +18,17 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:id", async (req, res) => {
+  try {
+    const promoter = await Promoter.findOne({userId: req.params.id})
+    res.json(promoter);
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
+
+
 // did not check
 // router.get("/:id", async (req, res) => {
 //   try {

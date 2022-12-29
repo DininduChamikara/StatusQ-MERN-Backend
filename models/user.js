@@ -22,6 +22,36 @@ const userSchema = new mongoose.Schema({
         required: true,
         default:"NORMAL_USER"
     },
+    imgUrl: {
+        type: String,
+    },
+    contactName: {
+        type: String,
+    },
+    contactEmail: {
+        type: String,
+    },
+    contactPhone: {
+        type: String,
+    },
+    accountStatus: {
+        type: String,
+    },
+    bankName: {
+        type: String,
+    },
+    branchName: {
+        type: String,
+    },
+    branchCode: {
+        type: String,
+    },
+    accountNumber: {
+        type: String,
+    },
+    accountHolderName: {
+        type: String,
+    },
     state: {
         type: String,
         required: true,
