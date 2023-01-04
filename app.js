@@ -2,6 +2,7 @@ const cookieParser = require("cookie-parser");
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const multer = require('multer');
 const url = "mongodb://localhost/StatusQ_DB_New";
 
 const app = express();
@@ -44,6 +45,10 @@ app.use("/campaigns", campaignRouter);
 
 const promoterCampaignRouter = require("./routes/promoterCampaigns");
 app.use("/promoterCampaigns", promoterCampaignRouter);
+
+const paymentRouter = require("./routes/payments");
+app.use("/payments", paymentRouter);
+
 
 app.listen(9000, () => {
   console.log("Server started");

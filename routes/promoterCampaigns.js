@@ -20,6 +20,30 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/job/:jobId", async (req, res) => {
+  try {
+    const promoterCampaign = await PromoterCampaign.findById(req.params.jobId);
+
+    if (promoterCampaign) {
+      const campaign = await getCampaign(promoterCampaign.campaignId);
+      res.json({
+        responseCode: "00",
+        status: "success",
+        message: "You can see the job details here",
+        promoterCampaign: promoterCampaign,
+        campaign: campaign,
+      });
+    }
+  } catch (err) {
+    res.status(400).json({ error: err });
+  }
+
+  async function getCampaign(campaignId) {
+    const campaign = await Campaign.findById(campaignId);
+    return campaign;
+  }
+});
+
 router.get("/:promoterId", async (req, res) => {
   try {
     const promoterCampaigns = await PromoterCampaign.find({
@@ -43,12 +67,14 @@ router.get("/:promoterId", async (req, res) => {
       const campaign = await getCampaign(element.campaignId);
 
       const promoterCampaignObj = {
+        jobId: element._id,
         dateTime: campaign.createdTime,
         campaignId: element.campaignId,
         clientId: element.clientId,
         platform: campaign.platform,
         adsCount: campaign.selectedAdvertisements.length,
-        budget: campaign.viewsFromEach,
+        requiredViews: campaign.viewsFromEach,
+        budget: campaign.viewsFromEach * campaign.selectedAdvertisements.length,
         state: element.state,
       };
 
@@ -92,5 +118,34 @@ router.post("/", async (req, res) => {
     res.status(400).json({ error: err });
   }
 });
+
+router.patch('/updateState/:id', async(req, res) => {
+  // console.log("patch called")
+  // res.json(req.params.id)
+  try{
+      const promoterCampaign = await PromoterCampaign.findById(req.params.id)
+      promoterCampaign.state = req.body.state;
+      const pc = await promoterCampaign.save();
+      // res.json(pc)
+      if(pc.state === "EXPIRED"){
+        res.json({
+          responseCode: "00",
+          status: "warning",
+          message: "This campaign is expired!",
+          promoterCampaign: pc,
+        });
+      }else if(pc.state === "ACCEPTED"){
+        res.json({
+          responseCode: "00",
+          status: "success",
+          message: "You successfully accept the campaign!",
+          promoterCampaign: pc,
+        });
+      }
+      
+  }catch(err){
+      res.send('Error ' + err)
+  }
+})
 
 module.exports = router;
