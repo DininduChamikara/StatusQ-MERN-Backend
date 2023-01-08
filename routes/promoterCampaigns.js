@@ -6,19 +6,19 @@ const { createTokens, validateToken } = require("../JWT");
 const Campaign = require("../models/campaign");
 const { findOne, findById } = require("../models/campaign");
 
-router.get("/", async (req, res) => {
-  try {
-    const promoterCampaigns = await PromoterCampaign.find();
-    res.json({
-      responseCode: "00",
-      status: "success",
-      message: "You can see all the ad campaigns",
-      promoterCampaigns: promoterCampaigns,
-    });
-  } catch (err) {
-    res.send("Error " + err);
-  }
-});
+// router.get("/", async (req, res) => {
+//   try {
+//     const promoterCampaigns = await PromoterCampaign.find();
+//     res.json({
+//       responseCode: "00",
+//       status: "success",
+//       message: "You can see all the ad campaigns",
+//       promoterCampaigns: promoterCampaigns,
+//     });
+//   } catch (err) {
+//     res.send("Error " + err);
+//   }
+// });
 
 router.get("/job/:jobId", async (req, res) => {
   try {
@@ -50,6 +50,8 @@ router.get("/:promoterId", async (req, res) => {
       promoterId: req.params.promoterId,
     });
 
+    // console.log(promoterCampaigns.length)
+
     getResData(promoterCampaigns);
   } catch (err) {
     res.status(400).json({ error: err });
@@ -75,6 +77,8 @@ router.get("/:promoterId", async (req, res) => {
         adsCount: campaign.selectedAdvertisements.length,
         requiredViews: campaign.viewsFromEach,
         budget: campaign.viewsFromEach * campaign.selectedAdvertisements.length,
+        acceptedTime: element.acceptedTime,
+        completedTime: element.completedTime,
         state: element.state,
       };
 
@@ -125,9 +129,13 @@ router.patch('/updateState/:id', async(req, res) => {
   try{
       const promoterCampaign = await PromoterCampaign.findById(req.params.id)
       promoterCampaign.state = req.body.state;
+      promoterCampaign.acceptedTime = req.body.acceptedTime;
+      promoterCampaign.completedTime = req.body.completedTime;
+      promoterCampaign.screenshots = req.body.screenshots;
+
       const pc = await promoterCampaign.save();
       // res.json(pc)
-      if(pc.state === "EXPIRED"){
+      if(pc.state === "AVAILABLE_EXPIRED" || pc.state === "ONGOING_EXPIRED"){
         res.json({
           responseCode: "00",
           status: "warning",
@@ -139,6 +147,20 @@ router.patch('/updateState/:id', async(req, res) => {
           responseCode: "00",
           status: "success",
           message: "You successfully accept the campaign!",
+          promoterCampaign: pc,
+        });
+      }else if(pc.state === "DECLINED"){
+        res.json({
+          responseCode: "00",
+          status: "warning",
+          message: "You declined the campaign!",
+          promoterCampaign: pc,
+        });
+      }else if(pc.state === "COMPLETED"){
+        res.json({
+          responseCode: "00",
+          status: "success",
+          message: "You successfully uploaded the screenshots!",
           promoterCampaign: pc,
         });
       }
