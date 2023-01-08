@@ -17,11 +17,23 @@ const promoterCampaignSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    acceptedTime: {
+        type: Date,
+    },
+    declinedTime: {
+        type: Date,
+    },
+    completedTime: {
+        type: Date,
+    },
     paymentApproved: {
         type: Boolean,
         required: true,
         default: false
-    }  
+    },
+    screenshots: {
+        type: Array(),
+    },
 })
 
 module.exports = mongoose.model('PromoterCampaign', promoterCampaignSchema)
