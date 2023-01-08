@@ -28,6 +28,20 @@ router.get("/:campaignId", async (req, res) => {
   }
 });
 
+router.get("/by_client/:clientId", async (req, res) => {
+  try {
+    const campaigns = await Campaign.find({clientId: req.params.clientId});
+    res.json({
+      responseCode: "00",
+      status: "success",
+      message: "You can see all your campaigns",
+      campaigns: campaigns,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.post("/", async (req, res) => {
   const {
     clientId,
