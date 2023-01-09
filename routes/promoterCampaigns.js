@@ -44,6 +44,20 @@ router.get("/job/:jobId", async (req, res) => {
   }
 });
 
+router.get("/promoterCampaignsByCampaign/:campaignId", async (req, res) => {
+  try {
+    const promoterCampaigns = await PromoterCampaign.find({campaignId:req.params.campaignId });
+    res.json({
+      responseCode: "00",
+      status: "success",
+      message: "Selected promoters list for the campaign",
+      promoterCampaigns: promoterCampaigns,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.get("/:promoterId", async (req, res) => {
   try {
     const promoterCampaigns = await PromoterCampaign.find({
@@ -163,6 +177,28 @@ router.patch('/updateState/:id', async(req, res) => {
           message: "You successfully uploaded the screenshots!",
           promoterCampaign: pc,
         });
+      }
+      
+  }catch(err){
+      res.send('Error ' + err)
+  }
+})
+
+
+router.patch('/updatePaymentApproved/:id', async(req, res) => {
+  try{
+      const promoterCampaign = await PromoterCampaign.findById(req.params.id)
+      promoterCampaign.paymentApproved = req.body.paymentApproved;
+
+      const pc = await promoterCampaign.save();
+
+      if(pc.paymentApproved === true){
+        res.json({
+          responseCode: "00",
+          status: "success",
+          message: "You approved the payment!",
+          promoterCampaign: pc,
+        })
       }
       
   }catch(err){
