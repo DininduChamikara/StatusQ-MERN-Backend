@@ -6,10 +6,24 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const { createTokens, validateToken } = require("../JWT");
 
-router.get("/", validateToken, async (req, res) => {
+// router.get("/", async (req, res) => {
+//   try {
+//     const users = await User.find();
+//     res.json(users);
+//   } catch (err) {
+//     res.send("Error " + err);
+//   }
+// });
+
+router.get("/", async (req, res) => {
   try {
     const users = await User.find();
-    res.json(users);
+    res.json({
+      responseCode: "00",
+      status: "success",
+      message: "View user desils",
+      users: users,
+    });
   } catch (err) {
     res.send("Error " + err);
   }
@@ -95,6 +109,53 @@ router.post("/login", async (req, res) => {
           status: "success",
           message: "You are logged successfully",
           user: user,
+        });
+      }
+    });
+  }
+});
+
+router.post("/changePassword", async (req, res) => {
+  const { userId, currentPassword, password, confirmPassword } = req.body;
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(400).json({
+      // error: "User Doesn't Exist"
+      responseCode: "1000",
+      status: "failure",
+      message: "Invalid Username or Password",
+    });
+  } else {
+    const dbPassword = user.password;
+    bcrypt.compare(currentPassword, dbPassword).then((match) => {
+      if (!match) {
+        res.status(400).json({
+          // error: "Wrong Username or Password"
+          responseCode: "1000",
+          status: "failure",
+          message: "Entered current password is invalid",
+        });
+      } else if(password !== confirmPassword){
+        res.status(400).json({
+          // error: "Wrong Username or Password"
+          responseCode: "1000",
+          status: "failure",
+          message: "Password is not match with confirm password",
+        });
+      } else {
+        bcrypt.hash(req.body.password, 10).then(async (hash) => {
+          user.password = hash;
+          try {
+            const changedUser = await user.save();
+            res.json({
+              responseCode: "00",
+              status: "success",
+              message: "Password changed successfully!",
+            });
+          } catch (err) {
+            res.json(err);
+          }
         });
       }
     });
