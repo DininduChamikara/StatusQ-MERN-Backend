@@ -58,6 +58,22 @@ router.get("/promoterCampaignsByCampaign/:campaignId", async (req, res) => {
   }
 });
 
+router.get("/promoterCampaignsAll", async (req, res) => {
+  try {
+    const promoterCampaigns = await PromoterCampaign.find();
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "All promoter campaign details here",
+      promoterCampaigns: promoterCampaigns,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
+
+
 router.get("/:promoterId", async (req, res) => {
   try {
     const promoterCampaigns = await PromoterCampaign.find({
