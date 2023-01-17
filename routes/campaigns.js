@@ -5,6 +5,67 @@ const Campaign = require("../models/campaign");
 const { createTokens, validateToken } = require("../JWT");
 const promoterCampaign = require("../models/promoterCampaign");
 
+router.get("/chart_data", async (req, res) => {
+  const currentDate = new Date();
+  let currentYear = currentDate.getFullYear();
+
+  try {
+
+    let currentYearCounts = [];
+    let previousYearCounts = [];
+
+    const campaigns = await Campaign.find();
+
+    const filteredOnCurrentYear = campaigns.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear;
+    });
+
+    const filteredOnPreviousYear = campaigns.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear - 1;
+    });
+
+    for(let i=0; i<12; i++){
+      let filterForMonth = filteredOnCurrentYear.filter((x) => {
+        let jsonDate = new Date(x.createdTime);
+        return jsonDate.getMonth() == i;
+      })
+      currentYearCounts.push(filterForMonth.length)
+    }
+
+    for(let i=0; i<12; i++){
+      let filterForMonth = filteredOnPreviousYear.filter((x) => {
+        let jsonDate = new Date(x.createdTime);
+        return jsonDate.getMonth() == i;
+      })
+      previousYearCounts.push(filterForMonth.length)
+    }
+
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Campaigns details chart",
+      chartData: [
+        {
+          year: currentYear - 1,
+          data: [
+            {name: "Campaign Creations", data: previousYearCounts}
+          ]
+        },
+        {
+          year: currentYear,
+          data: [
+            {name: "Campaign Creations", data: currentYearCounts}
+          ]
+        },      
+      ],
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.get("/", async (req, res) => {
   try {
     const campaigns = await Campaign.find();
@@ -44,7 +105,7 @@ router.get("/campaign/:campaignId", async (req, res) => {
 
 router.get("/by_client/:clientId", async (req, res) => {
   try {
-    const campaigns = await Campaign.find({clientId: req.params.clientId});
+    const campaigns = await Campaign.find({ clientId: req.params.clientId });
     res.json({
       responseCode: "00",
       status: "success",
