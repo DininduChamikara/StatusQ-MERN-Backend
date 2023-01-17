@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
     res.json({
       responseCode: "00",
       status: "success",
-      message: "You can see all our promoters here",
+      message: "You can see all promoters here",
       promoters: promoters,
     });
   } catch (err) {
@@ -20,14 +20,26 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const promoter = await Promoter.findOne({userId: req.params.id})
+    const promoter = await Promoter.findOne({ userId: req.params.id });
     res.json(promoter);
   } catch (err) {
     res.send("Error " + err);
   }
 });
 
-
+router.get("/promoter/:id", async (req, res) => {
+  try {
+    const promoter = await Promoter.findOne({ userId: req.params.id });
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Available Promoter Details",
+      promoter: promoter,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
 
 // did not check
 // router.get("/:id", async (req, res) => {
@@ -53,9 +65,14 @@ router.post("/getPromotersList", async (req, res) => {
   } = req.body;
 
   // these 2 arrays should pararal
-  const campaignAudienceArr = [educationAudience, ageAudience, regionalAudience, languageAudience];
+  const campaignAudienceArr = [
+    educationAudience,
+    ageAudience,
+    regionalAudience,
+    languageAudience,
+  ];
   const promoterAudienceCatTypeArr = ["education", "age", "region", "language"];
- 
+
   const promoters = await Promoter.find();
   const qualifiedPromoters = promoters.filter(
     (p) =>
@@ -69,51 +86,53 @@ router.post("/getPromotersList", async (req, res) => {
 
   let matchIndexEach = 0;
 
-  const matchedPromotersList = []; 
+  const matchedPromotersList = [];
 
   qualifiedPromoters.map((promoter) => {
     promoter.promoterAudienceCategoryList.map((audCat) => {
-      if(audCat.platform === platform){
+      if (audCat.platform === platform) {
         promoterAudienceCatTypeArr.map((cat) => {
-          if(audCat.categoryType === cat){
+          if (audCat.categoryType === cat) {
             campaignAudienceArr.map((camAudCat) => {
               camAudCat.map((category) => {
-                if(category === audCat.category){
-                  let minAccessViews = 0; 
+                if (category === audCat.category) {
+                  let minAccessViews = 0;
                   promoter.socialMediaList.map((platformX) => {
-                    if(platformX.platform === platform){
+                    if (platformX.platform === platform) {
                       minAccessViews = platformX.accessibleViewsCount;
-                      matchIndexEach = matchIndexEach + (audCat.count)/(minAccessViews);
+                      matchIndexEach =
+                        matchIndexEach + audCat.count / minAccessViews;
                     }
-                  })
-                  
+                  });
                 }
-              })
-            })
+              });
+            });
           }
-        })
+        });
       }
-    })
+    });
     promoter.promoterGenderAudienceList.map((genAudCat) => {
-      if(genAudCat.platform === platform){
+      if (genAudCat.platform === platform) {
         genderAudience.map((genCat) => {
-          if(genCat === "male"){
-            matchIndexEach = matchIndexEach + ((genAudCat.malePercentage)/100)
-          }else if(genCat === "female"){
-            matchIndexEach = matchIndexEach + ((genAudCat.femalePercentage)/100)
+          if (genCat === "male") {
+            matchIndexEach = matchIndexEach + genAudCat.malePercentage / 100;
+          } else if (genCat === "female") {
+            matchIndexEach = matchIndexEach + genAudCat.femalePercentage / 100;
           }
-        })
+        });
       }
-    })
+    });
     const matchedPromoterObj = {
       promoter: promoter,
       matchIndex: matchIndexEach,
-    }
+    };
     // console.log("matchIndexForEach is promoter", matchIndexEach)
     matchedPromotersList.push(matchedPromoterObj);
-  })
+  });
 
-  const sortedList = matchedPromotersList.sort((a, b) => b.matchIndex - a.matchIndex);
+  const sortedList = matchedPromotersList.sort(
+    (a, b) => b.matchIndex - a.matchIndex
+  );
   const filteredList = sortedList.slice(0, responseCount);
 
   res.json({

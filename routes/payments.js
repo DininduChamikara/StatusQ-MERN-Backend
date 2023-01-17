@@ -2,6 +2,20 @@ const express = require("express");
 const router = express.Router();
 const Payment = require("../models/payment");
 
+router.get("/", async (req, res) => {
+  try {
+    const payments = await Payment.find();
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "All the client payment records here",
+      payments: payments,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.get("/:userId", async (req, res) => {
   try {
     const payments = await Payment.find({userId: req.params.userId});

@@ -38,6 +38,20 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+router.get("/user/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "User Details",
+      user: user,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.post("/", async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email: email });
