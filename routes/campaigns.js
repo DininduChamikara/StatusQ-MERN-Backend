@@ -14,6 +14,9 @@ router.get("/chart_data", async (req, res) => {
     let currentYearCounts = [];
     let previousYearCounts = [];
 
+    let currentYearTotal;
+    let previousYearTotal;
+
     const campaigns = await Campaign.find();
 
     const filteredOnCurrentYear = campaigns.filter((x) => {
@@ -21,10 +24,14 @@ router.get("/chart_data", async (req, res) => {
       return jsonDate.getFullYear() == currentYear;
     });
 
+    currentYearTotal = filteredOnCurrentYear.length;
+
     const filteredOnPreviousYear = campaigns.filter((x) => {
       let jsonDate = new Date(x.createdTime);
       return jsonDate.getFullYear() == currentYear - 1;
     });
+
+    previousYearTotal = filteredOnPreviousYear.length;
 
     for(let i=0; i<12; i++){
       let filterForMonth = filteredOnCurrentYear.filter((x) => {
@@ -49,12 +56,14 @@ router.get("/chart_data", async (req, res) => {
       chartData: [
         {
           year: currentYear - 1,
+          total: previousYearTotal,
           data: [
             {name: "Campaign Creations", data: previousYearCounts}
           ]
         },
         {
           year: currentYear,
+          total: currentYearTotal,
           data: [
             {name: "Campaign Creations", data: currentYearCounts}
           ]
@@ -116,6 +125,30 @@ router.get("/by_client/:clientId", async (req, res) => {
     res.send("Error " + err);
   }
 });
+
+router.post("/by_client", async (req, res) => {
+  const {
+    clientId,
+    page,
+    pageCount,
+  } = req.body;
+
+  try {
+    const campaignsList = await Campaign.find({ clientId: clientId });
+
+    const campaigns = campaignsList.slice(page*pageCount, page*pageCount + pageCount)
+
+    res.json({
+      responseCode: "00",
+      status: "success",
+      message: "You can see all your campaigns",
+      total: campaignsList.length,
+      campaigns: campaigns,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+})
 
 router.post("/", async (req, res) => {
   const {

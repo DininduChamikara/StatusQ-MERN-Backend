@@ -129,8 +129,70 @@ router.get("/:promoterId", async (req, res) => {
   }
 });
 
+router.post("/byPromoterId", async (req, res) => {
+
+  const {
+    promoterId,
+    page,
+    pageCount,
+  } = req.body;
+
+  try {
+    const promoterCampaigns = await PromoterCampaign.find({
+      promoterId: promoterId,
+    });
+
+    getResData(promoterCampaigns);
+  } catch (err) {
+    res.status(400).json({ error: err });
+  }
+
+  async function getCampaign(campaignId) {
+    const campaign = await Campaign.findById(campaignId);
+    return campaign;
+  }
+
+  function getResData(promoterCampaigns) {
+    const promoterCampaignObjArr = [];
+
+    promoterCampaigns.forEach(async (element, index, array) => {
+      const campaign = await getCampaign(element.campaignId);
+
+      const promoterCampaignObj = {
+        jobId: element._id,
+        dateTime: campaign.createdTime,
+        campaignId: element.campaignId ? element.campaignId : "",
+        clientId: element.clientId ? element.clientId : "",
+        platform: campaign.platform,
+        adsCount: campaign.selectedAdvertisements.length,
+        requiredViews: campaign.viewsFromEach,
+        budget: campaign.viewsFromEach * campaign.selectedAdvertisements.length,
+        acceptedTime: element.acceptedTime,
+        completedTime: element.completedTime,
+        state: element.state,
+      };
+
+      promoterCampaignObjArr.push(promoterCampaignObj);
+
+      if (index === array.length - 1) {
+        const temp = promoterCampaignObjArr;
+
+        res.json({
+          responseCode: "00",
+          status: "success",
+          message: "You can see all the available campaigns here",
+          total: temp.length,
+          promoterCampaigns: temp,
+        });
+      }
+    });
+  }
+});
+
 router.post("/", async (req, res) => {
   const { clientId, promoterId, campaignId, state, paymentApproved } = req.body;
+
+  const currentTime = Date.now();
 
   const promoterCampaign = new PromoterCampaign({
     clientId: clientId,
@@ -138,6 +200,7 @@ router.post("/", async (req, res) => {
     campaignId: campaignId,
     paymentApproved: paymentApproved,
     state: state,
+    createdTime: currentTime,
   });
 
   try {
@@ -221,5 +284,76 @@ router.patch('/updatePaymentApproved/:id', async(req, res) => {
       res.send('Error ' + err)
   }
 })
+
+router.get("/chart/chart_data", async (req, res) => {
+
+  const currentDate = new Date();
+  let currentYear = currentDate.getFullYear();
+
+  try {
+
+    let currentYearCounts = [];
+    let previousYearCounts = [];
+
+    let currentYearTotal;
+    let previousYearTotal;
+
+    const promoterCampaigns = await PromoterCampaign.find();
+
+    const filteredOnCurrentYear = promoterCampaigns.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear;
+    });
+
+    currentYearTotal = filteredOnCurrentYear.length;
+
+    const filteredOnPreviousYear = promoterCampaigns.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear - 1;
+    });
+
+    previousYearTotal = filteredOnPreviousYear.length;
+
+    for(let i=0; i<12; i++){
+      let filterForMonth = filteredOnCurrentYear.filter((x) => {
+        let jsonDate = new Date(x.createdTime);
+        return jsonDate.getMonth() == i;
+      })
+      currentYearCounts.push(filterForMonth.length)
+    }
+
+    for(let i=0; i<12; i++){
+      let filterForMonth = filteredOnPreviousYear.filter((x) => {
+        let jsonDate = new Date(x.createdTime);
+        return jsonDate.getMonth() == i;
+      })
+      previousYearCounts.push(filterForMonth.length)
+    }
+
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Promoter Campaigns details chart",
+      chartData: [
+        {
+          year: currentYear - 1,
+          total: previousYearTotal,
+          data: [
+            {name: "Promoter allocations for Campaigns", data: previousYearCounts}
+          ]
+        },
+        {
+          year: currentYear,
+          total: currentYearTotal,
+          data: [
+            {name: "Promoter allocations for Campaigns", data: currentYearCounts}
+          ]
+        },      
+      ],
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
 
 module.exports = router;
