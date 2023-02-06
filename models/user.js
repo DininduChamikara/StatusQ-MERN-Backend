@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
         required: true,
         default:"NORMAL_USER"
     },
+    createdTime: {
+        type: Date,
+        required: true,
+    },
     imgUrl: {
         type: String,
     },

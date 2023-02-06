@@ -70,6 +70,7 @@ router.post("/", async (req, res) => {
         email: req.body.email,
         password: hash,
         userType: req.body.userType,
+        createdTime: req.body.createdTime,
         state: req.body.state,
       })
         .then(() => {
@@ -238,6 +239,146 @@ router.delete("/:id", async (req, res) => {
     const user = await User.findById(req.params.id);
     const a1 = await user.delete();
     res.json(a1);
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
+router.get("/normal_users/chart_data", async (req, res) => {
+  const currentDate = new Date();
+  let currentYear = currentDate.getFullYear();
+
+  try {
+
+    let currentYearCounts = [];
+    let previousYearCounts = [];
+
+    let currentYearTotal;
+    let previousYearTotal;
+
+    const users = await User.find();
+
+    const filteredOnCurrentYear = users.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear && x.userType == "NORMAL_USER";
+    });
+
+    currentYearTotal = filteredOnCurrentYear.length;
+
+    const filteredOnPreviousYear = users.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear - 1 && x.userType == "NORMAL_USER";
+    });
+
+    previousYearTotal = filteredOnPreviousYear.length;
+
+    for(let i=0; i<12; i++){
+      let filterForMonth = filteredOnCurrentYear.filter((x) => {
+        let jsonDate = new Date(x.createdTime);
+        return jsonDate.getMonth() == i;
+      })
+      currentYearCounts.push(filterForMonth.length)
+    }
+
+    for(let i=0; i<12; i++){
+      let filterForMonth = filteredOnPreviousYear.filter((x) => {
+        let jsonDate = new Date(x.createdTime);
+        return jsonDate.getMonth() == i;
+      })
+      previousYearCounts.push(filterForMonth.length)
+    }
+
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "User details chart",
+      chartData: [
+        {
+          year: currentYear - 1,
+          total: previousYearTotal,
+          data: [
+            {name: "User Account Creations", data: previousYearCounts}
+          ]
+        },
+        {
+          year: currentYear,
+          total: currentYearTotal,
+          data: [
+            {name: "User Account Creations", data: currentYearCounts}
+          ]
+        },      
+      ],
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
+router.get("/admin_users/chart_data", async (req, res) => {
+  const currentDate = new Date();
+  let currentYear = currentDate.getFullYear();
+
+  try {
+
+    let currentYearCounts = [];
+    let previousYearCounts = [];
+
+    let currentYearTotal;
+    let previousYearTotal;
+
+    const users = await User.find();
+
+    const filteredOnCurrentYear = users.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear && x.userType == "ADMIN_USER";
+    });
+
+    currentYearTotal = filteredOnCurrentYear.length;
+
+    const filteredOnPreviousYear = users.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear - 1 && x.userType == "ADMIN_USER";
+    });
+
+    previousYearTotal = filteredOnPreviousYear.length;
+
+    for(let i=0; i<12; i++){
+      let filterForMonth = filteredOnCurrentYear.filter((x) => {
+        let jsonDate = new Date(x.createdTime);
+        return jsonDate.getMonth() == i;
+      })
+      currentYearCounts.push(filterForMonth.length)
+    }
+
+    for(let i=0; i<12; i++){
+      let filterForMonth = filteredOnPreviousYear.filter((x) => {
+        let jsonDate = new Date(x.createdTime);
+        return jsonDate.getMonth() == i;
+      })
+      previousYearCounts.push(filterForMonth.length)
+    }
+
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "User details chart",
+      chartData: [
+        {
+          year: currentYear - 1,
+          total: previousYearTotal,
+          data: [
+            {name: "Admin Account Creations", data: previousYearCounts}
+          ]
+        },
+        {
+          year: currentYear,
+          total: currentYearTotal,
+          data: [
+            {name: "Admin Account Creations", data: currentYearCounts}
+          ]
+        },      
+      ],
+    });
   } catch (err) {
     res.send("Error " + err);
   }

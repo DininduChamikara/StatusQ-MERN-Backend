@@ -17,6 +17,10 @@ const promoterCampaignSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    createdTime:{
+        type: Date,
+        required: true,
+    },
     acceptedTime: {
         type: Date,
     },
