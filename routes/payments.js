@@ -30,6 +30,25 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
+router.post("/byUserId", async (req, res) => {
+  const { userId, page, pageCount } = req.body;
+  try {
+    const payments = await Payment.find({userId: userId});
+
+    const finalizedPayments = payments.slice(page*pageCount, page*pageCount + pageCount)
+
+    res.json({
+      responseCode: "00",
+      status: "success",
+      message: "Your transaction history is here",
+      total: payments.length,
+      payments: finalizedPayments,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.post("/", async (req, res) => {
   const {
     userId,
