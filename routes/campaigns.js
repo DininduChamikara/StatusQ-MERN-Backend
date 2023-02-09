@@ -89,6 +89,24 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.post("/getAllCampaigns", async (req, res) => {
+  const {page, pageCount} = req.body;
+  try {
+    const campaigns = await Campaign.find();
+    const filteredCampaigns = campaigns.slice(page*pageCount, page*pageCount + pageCount)
+
+    res.json({
+      responseCode: "00",
+      status: "success",
+      message: "You can see all the campaigns",
+      campaigns: filteredCampaigns,
+      total: campaigns.length,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+})
+
 router.get("/:campaignId", async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.campaignId);

@@ -72,7 +72,28 @@ router.get("/promoterCampaignsAll", async (req, res) => {
   }
 });
 
+router.post("/promoterCampaignsAll", async (req, res) => {
+  const {page, pageCount} = req.body;
 
+  try {
+    const promoterCampaigns = await PromoterCampaign.find();
+
+    const filteredPromoterCampaigns = promoterCampaigns.slice(
+      page * pageCount,
+      page * pageCount + pageCount
+    );
+
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "All promoter campaign details here",
+      promoterCampaigns: filteredPromoterCampaigns,
+      total: promoterCampaigns.length,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
 
 router.get("/:promoterId", async (req, res) => {
   try {

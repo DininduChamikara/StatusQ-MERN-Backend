@@ -16,6 +16,94 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/paymentsChart/chart_data", async (req, res) => {
+  const currentDate = new Date();
+  let currentYear = currentDate.getFullYear();
+
+  try {
+
+    let currentYearCounts = [];
+    let previousYearCounts = [];
+
+    let currentYearTotal;
+    let previousYearTotal;
+
+    const payments = await Payment.find();
+
+    const filteredOnCurrentYear = payments.filter((x) => {
+      let jsonDate = new Date(x.dateTime);
+      return jsonDate.getFullYear() == currentYear;
+    });
+
+    currentYearTotal = filteredOnCurrentYear.length;
+
+    const filteredOnPreviousYear = payments.filter((x) => {
+      let jsonDate = new Date(x.dateTime);
+      return jsonDate.getFullYear() == currentYear - 1;
+    });
+
+    previousYearTotal = filteredOnPreviousYear.length;
+
+    for(let i=0; i<12; i++){
+      let filterForMonth = filteredOnCurrentYear.filter((x) => {
+        let jsonDate = new Date(x.dateTime);
+        return jsonDate.getMonth() == i;
+      })
+      currentYearCounts.push(filterForMonth.length)
+    }
+
+    for(let i=0; i<12; i++){
+      let filterForMonth = filteredOnPreviousYear.filter((x) => {
+        let jsonDate = new Date(x.dateTime);
+        return jsonDate.getMonth() == i;
+      })
+      previousYearCounts.push(filterForMonth.length)
+    }
+
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Payment details chart",
+      chartData: [
+        {
+          year: currentYear - 1,
+          total: previousYearTotal,
+          data: [
+            {name: "Client Payments", data: previousYearCounts}
+          ]
+        },
+        {
+          year: currentYear,
+          total: currentYearTotal,
+          data: [
+            {name: "Client Payments", data: currentYearCounts}
+          ]
+        },      
+      ],
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
+router.post("/getClientPaymentsByPost", async (req, res) => {
+  const {page, pageCount} = req.body;
+  try {
+    const payments = await Payment.find();
+    const filteredPayments = payments.slice(page*pageCount, page*pageCount + pageCount)
+
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "All the client payment records here",
+      payments: filteredPayments,
+      total: payments.length,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.get("/:userId", async (req, res) => {
   try {
     const payments = await Payment.find({userId: req.params.userId});

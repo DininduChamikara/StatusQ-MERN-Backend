@@ -5,6 +5,10 @@ const promoterSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    updatedTime: {
+        type: Date,
+        require: true
+    },
     fullName: {
         type: String,
         required: true
