@@ -245,6 +245,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.get("/normal_users/chart_data", async (req, res) => {
+
   const currentDate = new Date();
   let currentYear = currentDate.getFullYear();
 

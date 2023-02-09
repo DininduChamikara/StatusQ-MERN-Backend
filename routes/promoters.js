@@ -18,6 +18,29 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.post("/getAllPromoters", async (req, res) => {
+  const { page, pageCount } = req.body;
+
+  try {
+    const promoters = await Promoter.find();
+
+    const filteredPromoters = promoters.slice(
+      page * pageCount,
+      page * pageCount + pageCount
+    );
+
+    res.json({
+      responseCode: "00",
+      status: "success",
+      message: "You can see all promoters here",
+      promoters: filteredPromoters,
+      total: promoters.length,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.get("/:id", async (req, res) => {
   try {
     const promoter = await Promoter.findOne({ userId: req.params.id });
@@ -35,6 +58,76 @@ router.get("/promoter/:id", async (req, res) => {
       status: "info",
       message: "Available Promoter Details",
       promoter: promoter,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
+router.get("/promotersChart/chart_data", async (req, res) => {
+  const currentDate = new Date();
+  let currentYear = currentDate.getFullYear();
+
+  try {
+
+    let currentYearCounts = [];
+    let previousYearCounts = [];
+
+    let currentYearTotal;
+    let previousYearTotal;
+
+    const promoters = await Promoter.find();
+
+    const filteredOnCurrentYear = promoters.filter((x) => {
+      let jsonDate = new Date(x.updatedTime);
+      return jsonDate.getFullYear() == currentYear;
+    });
+
+    currentYearTotal = filteredOnCurrentYear.length;
+
+    const filteredOnPreviousYear = promoters.filter((x) => {
+      let jsonDate = new Date(x.updatedTime);
+      return jsonDate.getFullYear() == currentYear - 1;
+    });
+
+    previousYearTotal = filteredOnPreviousYear.length;
+
+    for(let i=0; i<12; i++){
+      let filterForMonth = filteredOnCurrentYear.filter((x) => {
+        let jsonDate = new Date(x.updatedTime);
+        return jsonDate.getMonth() == i;
+      })
+      currentYearCounts.push(filterForMonth.length)
+    }
+
+    for(let i=0; i<12; i++){
+      let filterForMonth = filteredOnPreviousYear.filter((x) => {
+        let jsonDate = new Date(x.updatedTime);
+        return jsonDate.getMonth() == i;
+      })
+      previousYearCounts.push(filterForMonth.length)
+    }
+
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Promoter details chart",
+      chartData: [
+        {
+          year: currentYear - 1,
+          total: previousYearTotal,
+          data: [
+            {name: "Promoter Registrations", data: previousYearCounts}
+          ]
+        },
+        {
+          year: currentYear,
+          total: currentYearTotal,
+          data: [
+            {name: "Promoter Registrations", data: currentYearCounts}
+          ]
+        },      
+      ],
     });
   } catch (err) {
     res.send("Error " + err);
@@ -144,6 +237,8 @@ router.post("/getPromotersList", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  const date = new Date();
+
   const {
     userId,
     fullName,
@@ -164,6 +259,7 @@ router.post("/", async (req, res) => {
   const promoter = await Promoter.findOne({ userId: userId });
 
   if (promoter) {
+    promoter.updatedTime = date;
     promoter.fullName = fullName;
     promoter.nameWithInit = nameWithInit;
     promoter.dob = dob;
@@ -188,6 +284,7 @@ router.post("/", async (req, res) => {
   } else {
     Promoter.create({
       userId: userId,
+      updatedTime: date,
       fullName: fullName,
       nameWithInit: nameWithInit,
       dob: dob,
