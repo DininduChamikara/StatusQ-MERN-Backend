@@ -62,6 +62,11 @@ app.use("/promoterCampaigns", promoterCampaignRouter);
 const paymentRouter = require("./routes/payments");
 app.use("/payments", paymentRouter);
 
+const promoterReviewRouter = require("./routes/promoterReviews");
+app.use("/promoterReview", promoterReviewRouter);
+
+const clientReviewRouter = require("./routes/clientReviews");
+app.use("/clientReview", clientReviewRouter);
 
 app.listen(9000, () => {
   console.log("Server started");

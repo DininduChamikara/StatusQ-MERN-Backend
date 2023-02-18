@@ -10,7 +10,6 @@ router.get("/chart_data", async (req, res) => {
   let currentYear = currentDate.getFullYear();
 
   try {
-
     let currentYearCounts = [];
     let previousYearCounts = [];
 
@@ -33,20 +32,20 @@ router.get("/chart_data", async (req, res) => {
 
     previousYearTotal = filteredOnPreviousYear.length;
 
-    for(let i=0; i<12; i++){
+    for (let i = 0; i < 12; i++) {
       let filterForMonth = filteredOnCurrentYear.filter((x) => {
         let jsonDate = new Date(x.createdTime);
         return jsonDate.getMonth() == i;
-      })
-      currentYearCounts.push(filterForMonth.length)
+      });
+      currentYearCounts.push(filterForMonth.length);
     }
 
-    for(let i=0; i<12; i++){
+    for (let i = 0; i < 12; i++) {
       let filterForMonth = filteredOnPreviousYear.filter((x) => {
         let jsonDate = new Date(x.createdTime);
         return jsonDate.getMonth() == i;
-      })
-      previousYearCounts.push(filterForMonth.length)
+      });
+      previousYearCounts.push(filterForMonth.length);
     }
 
     res.json({
@@ -57,18 +56,65 @@ router.get("/chart_data", async (req, res) => {
         {
           year: currentYear - 1,
           total: previousYearTotal,
-          data: [
-            {name: "Campaign Creations", data: previousYearCounts}
-          ]
+          data: [{ name: "Campaign Creations", data: previousYearCounts }],
         },
         {
           year: currentYear,
           total: currentYearTotal,
-          data: [
-            {name: "Campaign Creations", data: currentYearCounts}
-          ]
-        },      
+          data: [{ name: "Campaign Creations", data: currentYearCounts }],
+        },
       ],
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
+router.get("/dashboard/chart_data", async (req, res) => {
+  const currentDate = new Date();
+  let currentYear = currentDate.getFullYear();
+
+  try {
+    let currentYearCounts = [];
+    let previousYearCounts = [];
+
+    let currentYearTotal;
+    let previousYearTotal;
+
+    const campaigns = await Campaign.find({ state: "ACTIVE" });
+
+    const filteredOnCurrentYear = campaigns.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear;
+    });
+
+    currentYearTotal = filteredOnCurrentYear.length;
+
+    const filteredOnPreviousYear = campaigns.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear - 1;
+    });
+
+    previousYearTotal = filteredOnPreviousYear.length;
+
+    for (let i = 0; i < 12; i++) {
+      let filterForMonth = filteredOnCurrentYear.filter((x) => {
+        let jsonDate = new Date(x.createdTime);
+        return jsonDate.getMonth() == i;
+      });
+      currentYearCounts.push(filterForMonth.length);
+    }
+
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Campaigns details chart",
+      chartData: {
+        year: currentYear,
+        total: currentYearTotal,
+        percentage: previousYearTotal !=0 ? (currentYearTotal - previousYearTotal)/previousYearTotal*100 : 100, 
+        data: { name: "Campaign Creations", data: currentYearCounts },
+      },
     });
   } catch (err) {
     res.send("Error " + err);
@@ -90,10 +136,13 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/getAllCampaigns", async (req, res) => {
-  const {page, pageCount} = req.body;
+  const { page, pageCount } = req.body;
   try {
     const campaigns = await Campaign.find();
-    const filteredCampaigns = campaigns.slice(page*pageCount, page*pageCount + pageCount)
+    const filteredCampaigns = campaigns.slice(
+      page * pageCount,
+      page * pageCount + pageCount
+    );
 
     res.json({
       responseCode: "00",
@@ -105,7 +154,7 @@ router.post("/getAllCampaigns", async (req, res) => {
   } catch (err) {
     res.send("Error " + err);
   }
-})
+});
 
 router.get("/:campaignId", async (req, res) => {
   try {
@@ -145,16 +194,17 @@ router.get("/by_client/:clientId", async (req, res) => {
 });
 
 router.post("/by_client", async (req, res) => {
-  const {
-    clientId,
-    page,
-    pageCount,
-  } = req.body;
+  const { clientId, page, pageCount } = req.body;
 
   try {
     const campaignsList = await Campaign.find({ clientId: clientId });
 
-    const campaigns = campaignsList.slice(page*pageCount, page*pageCount + pageCount)
+    const timeDecendingOrderedList = campaignsList.reverse();
+
+    const campaigns = timeDecendingOrderedList.slice(
+      page * pageCount,
+      page * pageCount + pageCount
+    );
 
     res.json({
       responseCode: "00",
@@ -166,7 +216,7 @@ router.post("/by_client", async (req, res) => {
   } catch (err) {
     res.send("Error " + err);
   }
-})
+});
 
 router.post("/", async (req, res) => {
   const {

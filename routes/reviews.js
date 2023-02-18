@@ -29,7 +29,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const { userId, firstname, lastname, ratingCount, date, description } = req.body;
+  const { userId, firstname, lastname, ratingCount, date, description, imageUrl } = req.body;
   const review = await Review.findOne({ userId: userId });
 
   if (review) {
@@ -38,6 +38,7 @@ router.post("/", async (req, res) => {
     review.ratingCount = ratingCount;
     review.date = date;
     review.description = description;
+    review.imageUrl = imageUrl;
 
     const r = await review.save();
     res.json({
