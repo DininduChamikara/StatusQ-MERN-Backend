@@ -18,6 +18,22 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/getClientReviewByJobId/:jobId", async (req, res) => {
+  try {
+    const clientReview = await ClientReview.findOne({
+      jobId: req.params.jobId,
+    });
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Client Review Info",
+      clientReview: clientReview,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.post("/", async (req, res) => {
   const {
     jobId,
