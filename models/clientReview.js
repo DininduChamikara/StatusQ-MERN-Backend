@@ -1,15 +1,15 @@
 const mongoose = require('mongoose')
 
-const reviewSchema = new mongoose.Schema({
-    userId: {
+const clientReviewSchema = new mongoose.Schema({
+    jobId: {
+        type: String,
+        required: true,
+    },
+    promoterId: {
         type: String,
         required: true
     },
-    firstname:{
-        type: String,
-        required: true
-    },
-    lastname:{
+    clientId: {
         type: String,
         required: true
     },
@@ -24,9 +24,6 @@ const reviewSchema = new mongoose.Schema({
     description: {
         type: String,
     },
-    imageUrl: {
-        type: String,
-    }
 })
 
-module.exports = mongoose.model('Review', reviewSchema)
+module.exports = mongoose.model('ClientReview', clientReviewSchema)

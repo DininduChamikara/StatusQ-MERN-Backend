@@ -58,6 +58,30 @@ router.get("/promoterCampaignsByCampaign/:campaignId", async (req, res) => {
   }
 });
 
+router.post("/promoterCampaignsByCampaign", async (req, res) => {
+  const {campaignId, page, pageCount} = req.body;
+
+  try {
+    const promoterCampaigns = await PromoterCampaign.find({campaignId: campaignId });
+    const timeDecendingOrderedList = promoterCampaigns.reverse();
+
+    const finalizedPromoterCampaigns = timeDecendingOrderedList.slice(
+      page * pageCount,
+      page * pageCount + pageCount
+    );
+
+    res.json({
+      responseCode: "00",
+      status: "success",
+      message: "Selected promoters list for the campaign",
+      promoterCampaigns: finalizedPromoterCampaigns,
+      total: promoterCampaigns.length,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.get("/promoterCampaignsAll", async (req, res) => {
   try {
     const promoterCampaigns = await PromoterCampaign.find();
@@ -163,7 +187,14 @@ router.post("/byPromoterId", async (req, res) => {
       promoterId: promoterId,
     });
 
-    getResData(promoterCampaigns);
+    const timeDecendingOrderedList = promoterCampaigns.reverse();
+
+    const finalizedPromoterCampaigns = timeDecendingOrderedList.slice(
+      page * pageCount,
+      page * pageCount + pageCount
+    );
+
+    getResData(finalizedPromoterCampaigns);
   } catch (err) {
     res.status(400).json({ error: err });
   }
