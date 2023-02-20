@@ -191,7 +191,9 @@ router.post("/byUserId", async (req, res) => {
   try {
     const payments = await Payment.find({ userId: userId });
 
-    const finalizedPayments = payments.slice(
+    const timeDecendingOrderedList = payments.reverse();
+
+    const finalizedPayments = timeDecendingOrderedList.slice(
       page * pageCount,
       page * pageCount + pageCount
     );
