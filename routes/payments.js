@@ -186,6 +186,20 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
+router.get("/paymentById/:paymentId", async (req, res) => {
+  try {
+    const payment = await Payment.findOne({_id: req.params.paymentId});
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Transaction Info",
+      payment: payment,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.post("/byUserId", async (req, res) => {
   const { userId, page, pageCount } = req.body;
   try {
