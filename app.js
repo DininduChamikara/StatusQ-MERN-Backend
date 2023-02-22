@@ -62,6 +62,9 @@ app.use("/promoterCampaigns", promoterCampaignRouter);
 const paymentRouter = require("./routes/payments");
 app.use("/payments", paymentRouter);
 
+const paymentApprovelRouter = require("./routes/paymentApprovels");
+app.use("/paymentApprovels", paymentApprovelRouter);
+
 const promoterReviewRouter = require("./routes/promoterReviews");
 app.use("/promoterReview", promoterReviewRouter);
 
