@@ -5,6 +5,80 @@ const Campaign = require("../models/campaign");
 const { createTokens, validateToken } = require("../JWT");
 const promoterCampaign = require("../models/promoterCampaign");
 
+router.get("/system_earnings_chart_data", async (req, res) => {
+  const currentDate = new Date();
+  let currentYear = currentDate.getFullYear();
+
+  try {
+    let currentYearCounts = [];
+    let previousYearCounts = [];
+
+    let currentYearTotal;
+    let previousYearTotal;
+
+    const campaigns = await Campaign.find();
+
+    const filteredOnCurrentYear = campaigns.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear;
+    });
+
+    currentYearTotal = filteredOnCurrentYear.length;
+
+    const filteredOnPreviousYear = campaigns.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear - 1;
+    });
+
+    previousYearTotal = filteredOnPreviousYear.length;
+
+    for (let i = 0; i < 12; i++) {
+      let filterForMonth = filteredOnCurrentYear.filter((x) => {
+        let jsonDate = new Date(x.createdTime);
+        return jsonDate.getMonth() == i;
+      });
+      let monthEarned = 0;
+      filterForMonth.map(item => {
+        monthEarned = monthEarned + item.systemFee;
+      })
+
+      currentYearCounts.push(monthEarned);
+    }
+
+    for (let i = 0; i < 12; i++) {
+      let filterForMonth = filteredOnPreviousYear.filter((x) => {
+        let jsonDate = new Date(x.createdTime);
+        return jsonDate.getMonth() == i;
+      });
+      let monthEarned = 0;
+      filterForMonth.map(item => {
+        monthEarned = monthEarned + item.systemFee;
+      })
+      previousYearCounts.push(monthEarned);
+    }
+
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Campaigns details chart",
+      chartData: [
+        {
+          year: currentYear - 1,
+          total: previousYearTotal,
+          data: [{ name: "Campaign Creations", data: previousYearCounts }],
+        },
+        {
+          year: currentYear,
+          total: currentYearTotal,
+          data: [{ name: "Campaign Creations", data: currentYearCounts }],
+        },
+      ],
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.get("/chart_data", async (req, res) => {
   const currentDate = new Date();
   let currentYear = currentDate.getFullYear();
@@ -64,6 +138,68 @@ router.get("/chart_data", async (req, res) => {
           data: [{ name: "Campaign Creations", data: currentYearCounts }],
         },
       ],
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
+router.get("/dashboard/system_profit_chart_data", async (req, res) => {
+  const currentDate = new Date();
+  let currentYear = currentDate.getFullYear();
+
+  try {
+    let currentYearCounts = [];
+
+    let currentYearTotal;
+    let previousYearTotal;
+
+    const campaigns = await Campaign.find({ state: "ACTIVE" });
+
+    const filteredOnCurrentYear = campaigns.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear;
+    });
+    let currentYearEarnings = 0;
+    filteredOnCurrentYear.map(item => {
+      currentYearEarnings = currentYearEarnings + item.systemFee;
+    })
+
+    currentYearTotal = currentYearEarnings;
+
+    const filteredOnPreviousYear = campaigns.filter((x) => {
+      let jsonDate = new Date(x.createdTime);
+      return jsonDate.getFullYear() == currentYear - 1;
+    });
+    let previousYearEarnings = 0;
+    filteredOnPreviousYear.map(item => {
+      previousYearEarnings = previousYearEarnings + item.systemFee;
+    })
+
+    previousYearTotal = previousYearEarnings;
+
+    for (let i = 0; i < 12; i++) {
+      let filterForMonth = filteredOnCurrentYear.filter((x) => {
+        let jsonDate = new Date(x.createdTime);
+        return jsonDate.getMonth() == i;
+      });
+      let monthEarned = 0;
+      filterForMonth.map(item => {
+        monthEarned = monthEarned + item.systemFee;
+      })
+      currentYearCounts.push(monthEarned);
+    }
+
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Earning details chart",
+      chartData: {
+        year: currentYear,
+        total: currentYearTotal,
+        percentage: previousYearTotal !=0 ? (currentYearTotal - previousYearTotal)/previousYearTotal*100 : 100, 
+        data: { name: "System Profit Earnings", data: currentYearCounts },
+      },
     });
   } catch (err) {
     res.send("Error " + err);
