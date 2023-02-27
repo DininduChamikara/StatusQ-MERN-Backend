@@ -71,6 +71,9 @@ app.use("/promoterReview", promoterReviewRouter);
 const clientReviewRouter = require("./routes/clientReviews");
 app.use("/clientReview", clientReviewRouter);
 
+const adminSettingsRouter = require("./routes/adminSettings");
+app.use("/adminSettings", adminSettingsRouter);
+
 app.listen(9000, () => {
   console.log("Server started");
 });
