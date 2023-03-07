@@ -134,16 +134,6 @@ router.get("/promotersChart/chart_data", async (req, res) => {
   }
 });
 
-// did not check
-// router.get("/:id", async (req, res) => {
-//   try {
-//     const review = await Review.findById(req.params.userId);
-//     res.json(review);
-//   } catch (err) {
-//     res.send("Error " + err);
-//   }
-// });
-
 router.post("/getPromotersList", async (req, res) => {
   const {
     platform,
@@ -229,6 +219,10 @@ router.post("/getPromotersList", async (req, res) => {
   const filteredList = sortedList.slice(0, responseCount);
 
   res.json({
+    additional_for_testing: {
+      promoters: promoters.length,
+      qualifiedPromoters: qualifiedPromoters.length
+    },
     responseCode: "00",
     status: "success",
     message: "The most suitable promoters list is generated",
@@ -280,6 +274,7 @@ router.post("/", async (req, res) => {
       responseCode: "00",
       status: "success",
       message: "You are successfully updated the promoter survey details",
+      promoter: p,
     });
   } else {
     Promoter.create({
@@ -305,6 +300,7 @@ router.post("/", async (req, res) => {
           responseCode: "00",
           status: "success",
           message: "You are successfully submitted the promoter survey",
+          promoter: p,
         });
       })
       .catch((err) => {
@@ -314,16 +310,5 @@ router.post("/", async (req, res) => {
       });
   }
 });
-
-// did not check
-// router.delete("/:id", async (req, res) => {
-//   try {
-//     const review = await Review.findById(req.params.userId);
-//     const r = await review.delete();
-//     res.json(r);
-//   } catch (err) {
-//     res.send("Error " + err);
-//   }
-// });
 
 module.exports = router;
