@@ -231,9 +231,10 @@ router.post("/byPromoterId", async (req, res) => {
 
         res.json({
           responseCode: "00",
-          status: "success",
-          message: "You can see all the available campaigns here",
+          status: "info",
+          message: "Your campaigns details here",
           total: temp.length,
+          isVisible: true,
           promoterCampaigns: temp,
         });
       }

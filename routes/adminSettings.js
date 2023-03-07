@@ -14,7 +14,8 @@ router.get("/", async (req, res) => {
       responseCode: "00",
       status: "info",
       message: "Admin Settings Details",
-      reviews: adminSettings,
+      isVisible: false,
+      adminSettings: adminSettings,
     });
   } catch (err) {
     res.send("Error " + err);
@@ -49,6 +50,7 @@ router.post("/", async (req, res) => {
       responseCode: "00",
       status: "success",
       message: "You are successfully update the settings",
+      adminSettings: s,
     });
   } else {
     AdminSettings.create({

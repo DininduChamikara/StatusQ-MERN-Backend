@@ -63,6 +63,7 @@ router.get("/paymentsChart/chart_data", async (req, res) => {
       responseCode: "00",
       status: "info",
       message: "Payment details chart",
+      isVisible: true,
       chartData: [
         {
           year: currentYear - 1,
@@ -103,7 +104,7 @@ router.get("/dashboard/chart_data", async (req, res) => {
 
     filteredOnCurrentYear.map((item) => {
       currentYearEarningTotal = currentYearEarningTotal + item.amount;
-    })
+    });
 
     currentYearTotal = filteredOnCurrentYear.length;
 
@@ -116,7 +117,7 @@ router.get("/dashboard/chart_data", async (req, res) => {
 
     filteredOnPreviousYear.map((item) => {
       previousYearEarningTotal = previousYearEarningTotal + item.amount;
-    })
+    });
 
     previousYearTotal = filteredOnPreviousYear.length;
 
@@ -129,7 +130,7 @@ router.get("/dashboard/chart_data", async (req, res) => {
       let monthlyEarning = 0;
       filterForMonth.map((item) => {
         monthlyEarning = monthlyEarning + item.amount;
-      })
+      });
 
       currentYearCounts.push(monthlyEarning);
     }
@@ -142,7 +143,12 @@ router.get("/dashboard/chart_data", async (req, res) => {
         year: currentYear,
         total: currentYearTotal,
         totalEarnings: currentYearEarningTotal,
-        percentage: previousYearEarningTotal != 0 ? (currentYearEarningTotal - previousYearEarningTotal)/previousYearEarningTotal*100 : 100, 
+        percentage:
+          previousYearEarningTotal != 0
+            ? ((currentYearEarningTotal - previousYearEarningTotal) /
+                previousYearEarningTotal) *
+              100
+            : 100,
         data: { name: "Client Payments", data: currentYearCounts },
       },
     });
@@ -186,14 +192,36 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
+router.get("/totalExpenditure/byUserId/:userId", async (req, res) => {
+  try {
+    const payments = await Payment.find({ userId: req.params.userId });
+
+    let expenditure = 0;
+    payments.map((item) => {
+      expenditure = expenditure + item.amount;
+    })
+
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Your transaction history is here",
+      isVisible: true,
+      totalExpenditure: expenditure,
+    });
+  } catch (err) {
+    res.send("Error" + err);
+  }
+});
+
 router.get("/paymentById/:paymentId", async (req, res) => {
   try {
-    const payment = await Payment.findOne({_id: req.params.paymentId});
+    const payment = await Payment.findOne({ _id: req.params.paymentId });
     res.json({
       responseCode: "00",
       status: "info",
       message: "Transaction Info",
       payment: payment,
+      isVisible: true,
     });
   } catch (err) {
     res.send("Error " + err);
@@ -218,6 +246,7 @@ router.post("/byUserId", async (req, res) => {
       message: "Your transaction history is here",
       total: payments.length,
       payments: finalizedPayments,
+      isVisible: true,
     });
   } catch (err) {
     res.send("Error " + err);
@@ -255,6 +284,7 @@ router.post("/", async (req, res) => {
       responseCode: "00",
       status: "success",
       message: "Your payment is completed. Thank you!",
+      isVisible: true,
       paymentInfo: p,
     });
   } catch (err) {

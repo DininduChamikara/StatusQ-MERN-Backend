@@ -59,6 +59,7 @@ router.post("/", async (req, res) => {
   if (user) {
     res.json({
       responseCode: "1000",
+      isVisible: true,
       status: "error",
       message: "Already you have an account",
     });
@@ -78,6 +79,7 @@ router.post("/", async (req, res) => {
           res.json({
             responseCode: "00",
             status: "success",
+            isVisible: true,
             message: "You are registered successfully",
           });
         })
@@ -108,6 +110,7 @@ router.post("/login", async (req, res) => {
         res.status(400).json({
           // error: "Wrong Username or Password"
           responseCode: "1000",
+          isVisible: true,
           status: "failure",
           message: "Invalid Username or Password",
         });
@@ -122,6 +125,7 @@ router.post("/login", async (req, res) => {
         res.json({
           responseCode: "00",
           status: "success",
+          isVisible: true,
           message: "You are logged successfully",
           user: user,
         });

@@ -11,6 +11,7 @@ router.get("/", async (req, res) => {
       responseCode: "00",
       status: "success",
       message: "You can see all our reviews here",
+      isVisible: true,
       reviews: reviews,
     });
   } catch (err) {

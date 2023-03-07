@@ -9,6 +9,7 @@ router.get("/", async (req, res) => {
       responseCode: "00",
       status: "info",
       message: "All the payment approvel records here",
+      isVisible: true,
       paymentApprovels: paymentPaarovels,
     });
   } catch (err) {
@@ -25,6 +26,7 @@ router.get("/byPromoterId/:promoterId", async (req, res) => {
       responseCode: "00",
       status: "success",
       message: "All payment approvel details",
+      isVisible: true,
       paymentApprovels: paymentApprovels,
     });
   } catch (err) {
@@ -62,6 +64,7 @@ router.post("/getEarnings/byPromoterId", async (req, res) => {
       responseCode: "00",
       status: "info",
       message: "All your payment receivings here",
+      isVisible: true,
       totalEarnings: totalEarnings,
       earningsAfterLastWitdrawal: earningsAfterLastWitdrawal
     });
@@ -89,6 +92,7 @@ router.post("/byPromoterId", async (req, res) => {
       status: "info",
       message: "All your payment receivings here",
       total: paymentApprovels.length,
+      isVisible: true,
       paymentApprovels: finalizedPaymentApprovels,
     });
   } catch (err) {
@@ -118,6 +122,7 @@ router.post("/", async (req, res) => {
       responseCode: "00",
       status: "success",
       message: "Successfully approved the payment. Thank you!",
+      isVisible: true,
       paymentApprovel: pa,
     });
   } catch (err) {
