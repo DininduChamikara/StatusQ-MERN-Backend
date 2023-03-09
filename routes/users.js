@@ -143,6 +143,7 @@ router.post("/changePassword", async (req, res) => {
       // error: "User Doesn't Exist"
       responseCode: "1000",
       status: "failure",
+      isVisible: true,
       message: "Invalid Username or Password",
     });
   } else {
@@ -153,6 +154,7 @@ router.post("/changePassword", async (req, res) => {
           // error: "Wrong Username or Password"
           responseCode: "1000",
           status: "failure",
+          isVisible: true,
           message: "Entered current password is invalid",
         });
       } else if(password !== confirmPassword){
@@ -160,6 +162,7 @@ router.post("/changePassword", async (req, res) => {
           // error: "Wrong Username or Password"
           responseCode: "1000",
           status: "failure",
+          isVisible: true,
           message: "Password is not match with confirm password",
         });
       } else {
@@ -170,6 +173,7 @@ router.post("/changePassword", async (req, res) => {
             res.json({
               responseCode: "00",
               status: "success",
+              isVisible: true,
               message: "Password changed successfully!",
             });
           } catch (err) {
@@ -220,6 +224,7 @@ router.post("/saveSettings", async (req, res) => {
       responseCode: "00",
       status: "success",
       message: "You are successfully update the changes",
+      isVisible: true,
       user: u,
     });
   }
