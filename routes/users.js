@@ -6,15 +6,6 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const { createTokens, validateToken } = require("../JWT");
 
-// router.get("/", async (req, res) => {
-//   try {
-//     const users = await User.find();
-//     res.json(users);
-//   } catch (err) {
-//     res.send("Error " + err);
-//   }
-// });
-
 router.get("/", async (req, res) => {
   try {
     const users = await User.find();
@@ -23,6 +14,20 @@ router.get("/", async (req, res) => {
       status: "success",
       message: "View user desils",
       users: users,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
+router.get("/usersCount", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Total Users Count",
+      usersCount: users.length,
     });
   } catch (err) {
     res.send("Error " + err);

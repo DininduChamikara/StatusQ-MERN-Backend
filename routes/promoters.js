@@ -18,6 +18,20 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/getPromotersCount", async (req, res) => {
+  try {
+    const promoters = await Promoter.find();
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Promoters count",
+      promotersCount: promoters.length,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.post("/getAllPromoters", async (req, res) => {
   const { page, pageCount } = req.body;
 
