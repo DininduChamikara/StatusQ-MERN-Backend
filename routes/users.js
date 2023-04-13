@@ -6,15 +6,6 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const { createTokens, validateToken } = require("../JWT");
 
-// router.get("/", async (req, res) => {
-//   try {
-//     const users = await User.find();
-//     res.json(users);
-//   } catch (err) {
-//     res.send("Error " + err);
-//   }
-// });
-
 router.get("/", async (req, res) => {
   try {
     const users = await User.find();
@@ -23,6 +14,20 @@ router.get("/", async (req, res) => {
       status: "success",
       message: "View user desils",
       users: users,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
+router.get("/usersCount", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Total Users Count",
+      usersCount: users.length,
     });
   } catch (err) {
     res.send("Error " + err);
@@ -143,6 +148,7 @@ router.post("/changePassword", async (req, res) => {
       // error: "User Doesn't Exist"
       responseCode: "1000",
       status: "failure",
+      isVisible: true,
       message: "Invalid Username or Password",
     });
   } else {
@@ -153,6 +159,7 @@ router.post("/changePassword", async (req, res) => {
           // error: "Wrong Username or Password"
           responseCode: "1000",
           status: "failure",
+          isVisible: true,
           message: "Entered current password is invalid",
         });
       } else if(password !== confirmPassword){
@@ -160,6 +167,7 @@ router.post("/changePassword", async (req, res) => {
           // error: "Wrong Username or Password"
           responseCode: "1000",
           status: "failure",
+          isVisible: true,
           message: "Password is not match with confirm password",
         });
       } else {
@@ -170,6 +178,7 @@ router.post("/changePassword", async (req, res) => {
             res.json({
               responseCode: "00",
               status: "success",
+              isVisible: true,
               message: "Password changed successfully!",
             });
           } catch (err) {
@@ -220,6 +229,7 @@ router.post("/saveSettings", async (req, res) => {
       responseCode: "00",
       status: "success",
       message: "You are successfully update the changes",
+      isVisible: true,
       user: u,
     });
   }

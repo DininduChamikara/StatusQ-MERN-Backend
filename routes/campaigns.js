@@ -271,6 +271,20 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/campaignsCount", async (req, res) => {
+  try {
+    const campaigns = await Campaign.find();
+    res.json({
+      responseCode: "00",
+      status: "info",
+      message: "Campaigns count",
+      campaignsCount: campaigns.length,
+    });
+  } catch (err) {
+    res.send("Error " + err);
+  }
+});
+
 router.post("/getAllCampaigns", async (req, res) => {
   const { page, pageCount } = req.body;
   try {

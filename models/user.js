@@ -24,7 +24,6 @@ const userSchema = new mongoose.Schema({
     },
     createdTime: {
         type: Date,
-        required: true,
     },
     imgUrl: {
         type: String,
