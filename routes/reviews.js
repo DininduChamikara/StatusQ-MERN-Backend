@@ -50,9 +50,12 @@ router.post("/", async (req, res) => {
   } else {
     Review.create({
       userId: userId,
+      firstname: firstname,
+      lastname: lastname,
       ratingCount: ratingCount,
       date: date,
       description: description,
+      imageUrl: imageUrl
     })
       .then(() => {
         res.json({
