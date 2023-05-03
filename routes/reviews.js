@@ -4,6 +4,8 @@ const Review = require("../models/review");
 
 const { createTokens, validateToken } = require("../JWT");
 
+//========================================================
+// get all system reviews
 router.get("/", async (req, res) => {
   try {
     const reviews = await Review.find();
@@ -19,7 +21,8 @@ router.get("/", async (req, res) => {
   }
 });
 
-// did not check
+//========================================================
+// did not check (not needed yet)
 router.get("/:id", async (req, res) => {
   try {
     const review = await Review.findById(req.params.userId);
@@ -29,6 +32,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+//========================================================
+// save system reviews
 router.post("/", async (req, res) => {
   const { userId, firstname, lastname, ratingCount, date, description, imageUrl } = req.body;
   const review = await Review.findOne({ userId: userId });
@@ -72,7 +77,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// did not check
+// did not check (not needed yet)
 router.delete("/:id", async (req, res) => {
   try {
     const review = await Review.findById(req.params.userId);

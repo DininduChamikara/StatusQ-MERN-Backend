@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const Payment = require("../models/payment");
 
+//====================================================
+// get all client payment records
 router.get("/", async (req, res) => {
   try {
     const payments = await Payment.find();
@@ -16,6 +18,8 @@ router.get("/", async (req, res) => {
   }
 });
 
+//====================================================
+// get payment details chart data
 router.get("/paymentsChart/chart_data", async (req, res) => {
   const currentDate = new Date();
   let currentYear = currentDate.getFullYear();
@@ -82,6 +86,8 @@ router.get("/paymentsChart/chart_data", async (req, res) => {
   }
 });
 
+//====================================================
+// get payments chart data for dashboard page
 router.get("/dashboard/chart_data", async (req, res) => {
   const currentDate = new Date();
   let currentYear = currentDate.getFullYear();
@@ -157,6 +163,8 @@ router.get("/dashboard/chart_data", async (req, res) => {
   }
 });
 
+//====================================================
+// get all the client payment records (Table formats)
 router.post("/getClientPaymentsByPost", async (req, res) => {
   const { page, pageCount } = req.body;
   try {
@@ -178,6 +186,8 @@ router.post("/getClientPaymentsByPost", async (req, res) => {
   }
 });
 
+//====================================================
+// get all payment records by user ID
 router.get("/:userId", async (req, res) => {
   try {
     const payments = await Payment.find({ userId: req.params.userId });
@@ -192,6 +202,8 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
+//====================================================
+// get total expenditure by user ID
 router.get("/totalExpenditure/byUserId/:userId", async (req, res) => {
   try {
     const payments = await Payment.find({ userId: req.params.userId });
@@ -213,6 +225,8 @@ router.get("/totalExpenditure/byUserId/:userId", async (req, res) => {
   }
 });
 
+//====================================================
+// get payment data by payment ID 
 router.get("/paymentById/:paymentId", async (req, res) => {
   try {
     const payment = await Payment.findOne({ _id: req.params.paymentId });
@@ -228,6 +242,8 @@ router.get("/paymentById/:paymentId", async (req, res) => {
   }
 });
 
+//====================================================
+// get payment data by userId (Table format)
 router.post("/byUserId", async (req, res) => {
   const { userId, page, pageCount } = req.body;
   try {
@@ -253,6 +269,8 @@ router.post("/byUserId", async (req, res) => {
   }
 });
 
+//====================================================
+// save a payment record
 router.post("/", async (req, res) => {
   const {
     userId,

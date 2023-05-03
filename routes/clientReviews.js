@@ -4,6 +4,8 @@ const ClientReview = require("../models/clientReview");
 
 const { createTokens, validateToken } = require("../JWT");
 
+//=======================================================
+// get all client reviews
 router.get("/", async (req, res) => {
   try {
     const clientReviews = await ClientReview.find();
@@ -18,6 +20,8 @@ router.get("/", async (req, res) => {
   }
 });
 
+//=======================================================
+// get client review by job ID
 router.get("/getClientReviewByJobId/:jobId", async (req, res) => {
   try {
     const clientReview = await ClientReview.findOne({
@@ -34,6 +38,8 @@ router.get("/getClientReviewByJobId/:jobId", async (req, res) => {
   }
 });
 
+//=======================================================
+// get client reviews avarage by client ID
 router.get("/getClientReviewsAvarageByClientId/:clientId", async (req, res) => {
   try {
     const clientReviews = await ClientReview.find({
@@ -73,6 +79,8 @@ router.get("/getClientReviewsAvarageByClientId/:clientId", async (req, res) => {
   }
 });
 
+//=======================================================
+// save clent review
 router.post("/", async (req, res) => {
   const {
     jobId,

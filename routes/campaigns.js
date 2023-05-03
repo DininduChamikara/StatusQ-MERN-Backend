@@ -5,6 +5,8 @@ const Campaign = require("../models/campaign");
 const { createTokens, validateToken } = require("../JWT");
 const promoterCampaign = require("../models/promoterCampaign");
 
+//=============================================================
+// to get the system earnings chart data
 router.get("/system_earnings_chart_data", async (req, res) => {
   const currentDate = new Date();
   let currentYear = currentDate.getFullYear();
@@ -79,6 +81,8 @@ router.get("/system_earnings_chart_data", async (req, res) => {
   }
 });
 
+//=============================================================
+// number of campaign creations on year
 router.get("/chart_data", async (req, res) => {
   const currentDate = new Date();
   let currentYear = currentDate.getFullYear();
@@ -144,6 +148,8 @@ router.get("/chart_data", async (req, res) => {
   }
 });
 
+//=============================================================
+// system profit chart data
 router.get("/dashboard/system_profit_chart_data", async (req, res) => {
   const currentDate = new Date();
   let currentYear = currentDate.getFullYear();
@@ -206,6 +212,7 @@ router.get("/dashboard/system_profit_chart_data", async (req, res) => {
   }
 });
 
+//=============================================================
 router.get("/dashboard/chart_data", async (req, res) => {
   const currentDate = new Date();
   let currentYear = currentDate.getFullYear();
@@ -257,6 +264,7 @@ router.get("/dashboard/chart_data", async (req, res) => {
   }
 });
 
+//=============================================================
 router.get("/", async (req, res) => {
   try {
     const campaigns = await Campaign.find();
@@ -271,6 +279,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+//=============================================================
 router.get("/campaignsCount", async (req, res) => {
   try {
     const campaigns = await Campaign.find();
@@ -285,6 +294,7 @@ router.get("/campaignsCount", async (req, res) => {
   }
 });
 
+//=============================================================
 router.post("/getAllCampaigns", async (req, res) => {
   const { page, pageCount } = req.body;
   try {
@@ -306,6 +316,7 @@ router.post("/getAllCampaigns", async (req, res) => {
   }
 });
 
+//=============================================================
 router.get("/:campaignId", async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.campaignId);
@@ -315,6 +326,7 @@ router.get("/:campaignId", async (req, res) => {
   }
 });
 
+//=============================================================
 router.get("/campaign/:campaignId", async (req, res) => {
   try {
     const campaign = await Campaign.findById(req.params.campaignId);
@@ -329,6 +341,7 @@ router.get("/campaign/:campaignId", async (req, res) => {
   }
 });
 
+//=============================================================
 router.get("/by_client/:clientId", async (req, res) => {
   try {
     const campaigns = await Campaign.find({ clientId: req.params.clientId });
@@ -343,6 +356,8 @@ router.get("/by_client/:clientId", async (req, res) => {
   }
 });
 
+//=============================================================
+// get campaigns based on client ID
 router.post("/by_client", async (req, res) => {
   const { clientId, page, pageCount } = req.body;
 
@@ -368,6 +383,8 @@ router.post("/by_client", async (req, res) => {
   }
 });
 
+//=============================================================
+// create an advertisement campaign
 router.post("/", async (req, res) => {
   const {
     clientId,

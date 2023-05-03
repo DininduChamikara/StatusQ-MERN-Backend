@@ -20,11 +20,6 @@ app.use(haltOnTimedout);
 // temporary added for timeout
 function haltOnTimedout(req, res, next) {
   if (!req.timedout){
-    // res.json({
-    //   responseCode: "00",
-    //   status: "error",
-    //   message: "Can't proceed now. Try again later!",
-    // })
     next();
   } 
   

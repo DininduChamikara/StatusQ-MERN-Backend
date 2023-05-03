@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const PaymentApprovel = require("../models/paymentApprovel");
 
+//===========================================================
+// get all payment approvels details
 router.get("/", async (req, res) => {
   try {
     const paymentPaarovels = await PaymentApprovel.find();
@@ -17,6 +19,8 @@ router.get("/", async (req, res) => {
   }
 });
 
+//===========================================================
+// get payment approvels by promoter ID
 router.get("/byPromoterId/:promoterId", async (req, res) => {
   try {
     const paymentApprovels = await PaymentApprovel.find({
@@ -34,6 +38,8 @@ router.get("/byPromoterId/:promoterId", async (req, res) => {
   }
 });
 
+//===========================================================
+// get payment recivings by promoter ID
 router.post("/getEarnings/byPromoterId", async (req, res) => {
   const { promoterId, lastWithdrawalDateTime } = req.body;
 
@@ -73,6 +79,8 @@ router.post("/getEarnings/byPromoterId", async (req, res) => {
   }
 });
 
+//===========================================================
+// get payment receivings by promoter ID (Table Format)
 router.post("/byPromoterId", async (req, res) => {
   const { promoterId, page, pageCount } = req.body;
   try {
@@ -100,6 +108,8 @@ router.post("/byPromoterId", async (req, res) => {
   }
 });
 
+//===========================================================
+// approving the payment by client for promoter for a selected job
 router.post("/", async (req, res) => {
   const currentDate = new Date();
 

@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 
+// alien file is only a testing file to begin the node project
+
 const alienSchema = new mongoose.Schema({
     name: {
         type: String,

@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 const Alien = require('../models/alien')
 
+// alien file is only a testing file to begin the node project
+
 router.get('/', async(req, res)=> {
     try{
         const aliens = await Alien.find()

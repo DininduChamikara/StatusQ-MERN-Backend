@@ -4,6 +4,8 @@ const Promoter = require("../models/promoter");
 
 const { createTokens, validateToken } = require("../JWT");
 
+//=======================================================
+// get all promoters
 router.get("/", async (req, res) => {
   try {
     const promoters = await Promoter.find();
@@ -18,6 +20,8 @@ router.get("/", async (req, res) => {
   }
 });
 
+//=======================================================
+// get total promoters count
 router.get("/getPromotersCount", async (req, res) => {
   try {
     const promoters = await Promoter.find();
@@ -32,6 +36,8 @@ router.get("/getPromotersCount", async (req, res) => {
   }
 });
 
+//=======================================================
+// get all promoters (Table format)
 router.post("/getAllPromoters", async (req, res) => {
   const { page, pageCount } = req.body;
 
@@ -55,6 +61,8 @@ router.post("/getAllPromoters", async (req, res) => {
   }
 });
 
+//=======================================================
+// get promoter by ID
 router.get("/:id", async (req, res) => {
   try {
     const promoter = await Promoter.findOne({ userId: req.params.id });
@@ -64,6 +72,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+//=======================================================
 router.get("/promoter/:id", async (req, res) => {
   try {
     const promoter = await Promoter.findOne({ userId: req.params.id });
@@ -78,6 +87,8 @@ router.get("/promoter/:id", async (req, res) => {
   }
 });
 
+//=======================================================
+// get promoter chart data 
 router.get("/promotersChart/chart_data", async (req, res) => {
   const currentDate = new Date();
   let currentYear = currentDate.getFullYear();
@@ -148,6 +159,8 @@ router.get("/promotersChart/chart_data", async (req, res) => {
   }
 });
 
+//========================================================================
+// for getting most suitable promoters list for the advertisement campaign
 router.post("/getPromotersList", async (req, res) => {
   const {
     platform,
@@ -170,7 +183,9 @@ router.post("/getPromotersList", async (req, res) => {
   ];
   const promoterAudienceCatTypeArr = ["education", "age", "region", "language"];
 
+  // to get all promoters that system has
   const promoters = await Promoter.find();
+  // filter the qualified promoters only
   const qualifiedPromoters = promoters.filter(
     (p) =>
       (p.socialMediaList[0].platform === platform &&
@@ -181,22 +196,33 @@ router.post("/getPromotersList", async (req, res) => {
         p.socialMediaList[2].accessibleViewsCount >= minAccessibleViews)
   );
 
+  // initialize tha match index
   let matchIndexEach = 0;
 
   const matchedPromotersList = [];
 
+  // go to each qualified promoter
   qualifiedPromoters.map((promoter) => {
+    // visit each qualified promoter's audience category
     promoter.promoterAudienceCategoryList.map((audCat) => {
+      // check with campaign required platform and promoter's available social media platforms
       if (audCat.platform === platform) {
+        // go to each audience category type
         promoterAudienceCatTypeArr.map((cat) => {
+          // check the each audience category with campaign required audience category
           if (audCat.categoryType === cat) {
+            // go to each campaign required audience category
             campaignAudienceArr.map((camAudCat) => {
               camAudCat.map((category) => {
+                // check campaign audience categories with promoter's audience categories
                 if (category === audCat.category) {
                   let minAccessViews = 0;
+                  // go to each promoters social media platform
                   promoter.socialMediaList.map((platformX) => {
                     if (platformX.platform === platform) {
+                      // get minimum accessible views amount
                       minAccessViews = platformX.accessibleViewsCount;
+                      // generate match index for each audiece category
                       matchIndexEach =
                         matchIndexEach + audCat.count / minAccessViews;
                     }
@@ -208,6 +234,7 @@ router.post("/getPromotersList", async (req, res) => {
         });
       }
     });
+    // go to each peomoter's audience based on gender
     promoter.promoterGenderAudienceList.map((genAudCat) => {
       if (genAudCat.platform === platform) {
         genderAudience.map((genCat) => {
@@ -223,13 +250,16 @@ router.post("/getPromotersList", async (req, res) => {
       promoter: promoter,
       matchIndex: matchIndexEach,
     };
-    // console.log("matchIndexForEach is promoter", matchIndexEach)
+    // create matched promoters objects list with their match indexes
     matchedPromotersList.push(matchedPromoterObj);
   });
 
+  // sort the matched promoter list based on match indexes
   const sortedList = matchedPromotersList.sort(
     (a, b) => b.matchIndex - a.matchIndex
   );
+
+  // filter the list on required response count
   const filteredList = sortedList.slice(0, responseCount);
 
   res.json({
@@ -244,6 +274,8 @@ router.post("/getPromotersList", async (req, res) => {
   });
 });
 
+//===================================================
+// save a promoter
 router.post("/", async (req, res) => {
   const date = new Date();
 

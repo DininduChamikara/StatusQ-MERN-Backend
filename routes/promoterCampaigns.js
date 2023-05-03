@@ -6,20 +6,8 @@ const { createTokens, validateToken } = require("../JWT");
 const Campaign = require("../models/campaign");
 const { findOne, findById } = require("../models/campaign");
 
-// router.get("/", async (req, res) => {
-//   try {
-//     const promoterCampaigns = await PromoterCampaign.find();
-//     res.json({
-//       responseCode: "00",
-//       status: "success",
-//       message: "You can see all the ad campaigns",
-//       promoterCampaigns: promoterCampaigns,
-//     });
-//   } catch (err) {
-//     res.send("Error " + err);
-//   }
-// });
-
+//============================================================
+// get job data by job ID
 router.get("/job/:jobId", async (req, res) => {
   try {
     const promoterCampaign = await PromoterCampaign.findById(req.params.jobId);
@@ -44,6 +32,7 @@ router.get("/job/:jobId", async (req, res) => {
   }
 });
 
+//============================================================
 router.get("/promoterCampaignsByCampaign/:campaignId", async (req, res) => {
   try {
     const promoterCampaigns = await PromoterCampaign.find({campaignId:req.params.campaignId });
@@ -58,6 +47,8 @@ router.get("/promoterCampaignsByCampaign/:campaignId", async (req, res) => {
   }
 });
 
+//============================================================
+// get promoterCampigns by campaign ID (Table Format)
 router.post("/promoterCampaignsByCampaign", async (req, res) => {
   const {campaignId, page, pageCount} = req.body;
 
@@ -82,6 +73,8 @@ router.post("/promoterCampaignsByCampaign", async (req, res) => {
   }
 });
 
+//============================================================
+// get all promoter campaigns
 router.get("/promoterCampaignsAll", async (req, res) => {
   try {
     const promoterCampaigns = await PromoterCampaign.find();
@@ -96,6 +89,8 @@ router.get("/promoterCampaignsAll", async (req, res) => {
   }
 });
 
+//============================================================
+// get all promoter campaigns (Table format)
 router.post("/promoterCampaignsAll", async (req, res) => {
   const {page, pageCount} = req.body;
 
@@ -119,13 +114,13 @@ router.post("/promoterCampaignsAll", async (req, res) => {
   }
 });
 
+//============================================================
+// get available campaigns by promoter ID
 router.get("/:promoterId", async (req, res) => {
   try {
     const promoterCampaigns = await PromoterCampaign.find({
       promoterId: req.params.promoterId,
     });
-
-    // console.log(promoterCampaigns.length)
 
     getResData(promoterCampaigns);
   } catch (err) {
@@ -160,7 +155,6 @@ router.get("/:promoterId", async (req, res) => {
       promoterCampaignObjArr.push(promoterCampaignObj);
 
       if (index === array.length - 1) {
-        // console.log(promoterCampaignObjArr);
         const temp = promoterCampaignObjArr;
 
         res.json({
@@ -174,6 +168,8 @@ router.get("/:promoterId", async (req, res) => {
   }
 });
 
+//============================================================
+// get promoter campaigns by promoter ID (Table format)
 router.post("/byPromoterId", async (req, res) => {
 
   const {
@@ -242,6 +238,8 @@ router.post("/byPromoterId", async (req, res) => {
   }
 });
 
+//============================================================
+// save promoterCampaign
 router.post("/", async (req, res) => {
   const { clientId, promoterId, campaignId, state, paymentApproved } = req.body;
 
@@ -269,9 +267,9 @@ router.post("/", async (req, res) => {
   }
 });
 
+//============================================================
+// update promoterCampaign
 router.patch('/updateState/:id', async(req, res) => {
-  // console.log("patch called")
-  // res.json(req.params.id)
   try{
       const promoterCampaign = await PromoterCampaign.findById(req.params.id)
       promoterCampaign.state = req.body.state;
@@ -316,7 +314,8 @@ router.patch('/updateState/:id', async(req, res) => {
   }
 })
 
-
+//============================================================
+// update payment approvel by id
 router.patch('/updatePaymentApproved/:id', async(req, res) => {
   try{
       const promoterCampaign = await PromoterCampaign.findById(req.params.id)
@@ -338,6 +337,8 @@ router.patch('/updatePaymentApproved/:id', async(req, res) => {
   }
 })
 
+//============================================================
+// get promoter campaign chart data
 router.get("/chart/chart_data", async (req, res) => {
 
   const currentDate = new Date();
