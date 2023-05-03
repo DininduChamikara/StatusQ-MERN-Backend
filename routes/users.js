@@ -6,6 +6,8 @@ const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const { createTokens, validateToken } = require("../JWT");
 
+//========================================================
+// get all users
 router.get("/", async (req, res) => {
   try {
     const users = await User.find();
@@ -20,6 +22,8 @@ router.get("/", async (req, res) => {
   }
 });
 
+//=======================================================
+// get total user count
 router.get("/usersCount", async (req, res) => {
   try {
     const users = await User.find();
@@ -34,6 +38,8 @@ router.get("/usersCount", async (req, res) => {
   }
 });
 
+//=======================================================
+// get user by ID (not used)
 router.get("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -43,6 +49,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+//=======================================================
+// get user by ID
 router.get("/user/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -57,6 +65,8 @@ router.get("/user/:id", async (req, res) => {
   }
 });
 
+//=======================================================
+// save a user (register the user)
 router.post("/", async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email: email });
@@ -80,7 +90,6 @@ router.post("/", async (req, res) => {
         state: req.body.state,
       })
         .then(() => {
-          // res.json("USER REGISTERED");
           res.json({
             responseCode: "00",
             status: "success",
@@ -97,13 +106,14 @@ router.post("/", async (req, res) => {
   }
 });
 
+//=======================================================
+// system login for admin and mormal user
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email: email });
 
   if (!user) {
     res.status(400).json({
-      // error: "User Doesn't Exist"
       responseCode: "1000",
       status: "failure",
       message: "Invalid Username or Password",
@@ -113,7 +123,6 @@ router.post("/login", async (req, res) => {
     bcrypt.compare(password, dbPassword).then((match) => {
       if (!match) {
         res.status(400).json({
-          // error: "Wrong Username or Password"
           responseCode: "1000",
           isVisible: true,
           status: "failure",
@@ -139,13 +148,14 @@ router.post("/login", async (req, res) => {
   }
 });
 
+//=======================================================
+// change password 
 router.post("/changePassword", async (req, res) => {
   const { userId, currentPassword, password, confirmPassword } = req.body;
   const user = await User.findById(userId);
 
   if (!user) {
     res.status(400).json({
-      // error: "User Doesn't Exist"
       responseCode: "1000",
       status: "failure",
       isVisible: true,
@@ -156,7 +166,6 @@ router.post("/changePassword", async (req, res) => {
     bcrypt.compare(currentPassword, dbPassword).then((match) => {
       if (!match) {
         res.status(400).json({
-          // error: "Wrong Username or Password"
           responseCode: "1000",
           status: "failure",
           isVisible: true,
@@ -164,7 +173,6 @@ router.post("/changePassword", async (req, res) => {
         });
       } else if(password !== confirmPassword){
         res.status(400).json({
-          // error: "Wrong Username or Password"
           responseCode: "1000",
           status: "failure",
           isVisible: true,
@@ -190,6 +198,8 @@ router.post("/changePassword", async (req, res) => {
   }
 });
 
+//=======================================================
+// save user's personal infomation
 router.post("/saveSettings", async (req, res) => {
   const {
     userId,
@@ -234,20 +244,10 @@ router.post("/saveSettings", async (req, res) => {
     });
   }
 
-  // let user = await User.findById({userId})
 });
 
-// router.patch('/:id', async(req, res) => {
-//     try{
-//         const user = await User.findById(req.params.id)
-//         alien.sub = req.body.sub
-//         const a1 = await alien.save()
-//         res.json(a1)
-//     }catch(err){
-//         res.send('Error ' + err)
-//     }
-// })
-
+//=======================================================
+// delete a user
 router.delete("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
@@ -258,6 +258,8 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+//=======================================================
+// get normal users chart data
 router.get("/normal_users/chart_data", async (req, res) => {
 
   const currentDate = new Date();
@@ -329,6 +331,8 @@ router.get("/normal_users/chart_data", async (req, res) => {
   }
 });
 
+//=======================================================
+// get admin users chart data
 router.get("/admin_users/chart_data", async (req, res) => {
   const currentDate = new Date();
   let currentYear = currentDate.getFullYear();

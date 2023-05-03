@@ -4,6 +4,8 @@ const PromoterReview = require("../models/promoterReview");
 
 const { createTokens, validateToken } = require("../JWT");
 
+//=================================================================
+// get payment reviews by job ID
 router.get("/getPromterReviewByJobId/:jobId", async (req, res) => {
   try {
     const promoterReview = await PromoterReview.findOne({
@@ -20,6 +22,8 @@ router.get("/getPromterReviewByJobId/:jobId", async (req, res) => {
   }
 });
 
+//=================================================================
+// get promoter reviews by promoter ID
 router.get("/getPromterReviewsByPromoterId/:promoterId", async (req, res) => {
   try {
     const promoterReviews = await PromoterReview.find({
@@ -36,6 +40,8 @@ router.get("/getPromterReviewsByPromoterId/:promoterId", async (req, res) => {
   }
 });
 
+//=================================================================
+// get promoter reviews chart data by promoter ID
 router.get("/getPromterReviewsChartDataByPromoterId/:promoterId", async (req, res) => {
   try {
     const promoterReviews = await PromoterReview.find({
@@ -73,6 +79,8 @@ router.get("/getPromterReviewsChartDataByPromoterId/:promoterId", async (req, re
   }
 });
 
+//=================================================================
+// get all promoter reviews
 router.get("/", async (req, res) => {
   try {
     const promoterReviews = await PromoterReview.find();
@@ -87,6 +95,8 @@ router.get("/", async (req, res) => {
   }
 });
 
+//=================================================================
+// save a promoter review
 router.post("/", async (req, res) => {
   const { jobId, promoterId, clientId, ratingCount, date, description } =
     req.body;

@@ -4,10 +4,11 @@ const AdminSettings = require("../models/adminSettings");
 
 const { createTokens, validateToken } = require("../JWT");
 
+//========================================================
+// to get the admin settings
 router.get("/", async (req, res) => {
   try {
     const adminSettingsArray = await AdminSettings.find();
-
     const adminSettings = adminSettingsArray[0];
 
     res.json({
@@ -22,6 +23,8 @@ router.get("/", async (req, res) => {
   }
 });
 
+//========================================================
+// to set the admin settings
 router.post("/", async (req, res) => {
   const {
     maxAdPostsForCampaign,
